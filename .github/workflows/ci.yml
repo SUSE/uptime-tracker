@@ -1,0 +1,24 @@
+name: CI Tests
+on: [push, pull_request]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup up Go
+        uses: actions/setup-go@v4
+
+      - name: Build
+        run: make build
+
+      - name: Unit Tests
+        run: make test
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.53
+
+      - name: Validate Go
+        run: scripts/validate-ci
