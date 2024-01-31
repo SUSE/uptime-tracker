@@ -63,8 +63,8 @@ func TestPurgeOldUptimeLogs(t *testing.T) {
         if err != nil {
                 t.Fatalf("Failed to populate old uptime logs content for testing")
         }
-        uptimelog, err := readUptimeLogFile(tempFilePath)
-        purgelog, err :=  purgeOldUptimeLogs(uptimelog)
+        uptimelog, _ := readUptimeLogFile(tempFilePath)
+        purgelog, _ :=  purgeOldUptimeLogs(uptimelog)
         if len(purgelog) != 1 {
                 t.Fatalf("Failed to purge old uptime logs entry")
         }
@@ -81,7 +81,7 @@ func TestUpdateuptimeLogs(t *testing.T) {
         if err != nil {
                 t.Fatalf("Failed to populate uptime logs content for testing")
         }
-        uptimelog, err := readUptimeLogFile(tempFilePath)
+        uptimelog, _ := readUptimeLogFile(tempFilePath)
         uptimelog =  updateUptimeLogs(uptimelog)
         timeupd := string(uptimelog[currdate])
         activehr := timeupd[strhour:strhour+1]
