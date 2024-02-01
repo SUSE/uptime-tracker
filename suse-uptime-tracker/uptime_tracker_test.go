@@ -13,8 +13,8 @@ const (
     DDMMYYYY = "2006-01-02"
 )
 
-func createTestUptimeLogsFileWithContent(content string) (string, error) {
-	tempFile, err := ioutil.TempFile("", "testUptimeLogs")
+func createTestUptimeLogFileWithContent(content string) (string, error) {
+	tempFile, err := ioutil.TempFile("", "testUptimeLog")
 	if err != nil {
 		return "", err
 	}
@@ -33,18 +33,18 @@ func createTestUptimeLogsFileWithContent(content string) (string, error) {
 
 func TestUptimeLogFileDoesNotExist(t *testing.T) {
 	bogusUptimeLogsFilePath := uuid.New().String()
-	uptimeLogs, err := readUptimeLogFile(bogusUptimeLogsFilePath)
-	if uptimeLogs != nil || err != nil {
-		t.Fatalf("Expected err and uptimeLogs to be nil if uptime logs file does not exist")
+	uptimeLog, err := readUptimeLogFile(bogusUptimeLogsFilePath)
+	if uptimeLog != nil || err != nil {
+		t.Fatalf("Expected err and uptimeLog to be nil if uptime log file does not exist")
 	}
 }
 
-func TestCorruptedUptimeLogs(t *testing.T) {
-	corruptedUptimeLogs := `2024-01-18:000000000000001000110000
+func TestCorruptedUptimeLog(t *testing.T) {
+	corruptedUptimeLog := `2024-01-18:000000000000001000110000
 2024-01-13000000000000000000010000`
-	tempFilePath, err := createTestUptimeLogsFileWithContent(corruptedUptimeLogs)
+	tempFilePath, err := createTestUptimeLogFileWithContent(corruptedUptimeLog)
 	if err != nil {
-		t.Fatalf("Failed to create temp uptime logs file for testing")
+		t.Fatalf("Failed to create temp uptime log file for testing")
 	}
 	_, err = readUptimeLogFile(tempFilePath)
 	if err == nil {
@@ -53,36 +53,36 @@ func TestCorruptedUptimeLogs(t *testing.T) {
         defer os.Remove(tempFilePath)
 }
 
-func TestPurgeOldUptimeLogs(t *testing.T) {
+func TestPurgeOldUptimeLog(t *testing.T) {
         datetime    := time.Now().UTC()
         currdate    := string((datetime.Format(DDMMYYYY)))
         olddatetime := datetime.AddDate(-1,0,0)
         olddate     := string((olddatetime.Format(DDMMYYYY)))
-        PurgeOldUptimeLogs := currdate + ":000000000000001000110000\n" + olddate + ":000000000000000000010000\n"
-        tempFilePath, err := createTestUptimeLogsFileWithContent(PurgeOldUptimeLogs)
+        PurgeOldUptimeLog := currdate + ":000000000000001000110000\n" + olddate + ":000000000000000000010000\n"
+        tempFilePath, err := createTestUptimeLogFileWithContent(PurgeOldUptimeLog)
         if err != nil {
                 t.Fatalf("Failed to populate old uptime logs content for testing")
         }
         uptimelog, _ := readUptimeLogFile(tempFilePath)
-        purgelog, _ :=  purgeOldUptimeLogs(uptimelog)
+        purgelog, _ :=  purgeOldUptimeLog(uptimelog)
         if len(purgelog) != 1 {
                 t.Fatalf("Failed to purge old uptime logs entry")
         }
         defer os.Remove(tempFilePath)
 }
 
-func TestUpdateuptimeLogs(t *testing.T) {
+func TestUpdateuptimeLog(t *testing.T) {
         datetime := time.Now().UTC()
         hour, _, _ := datetime.Clock()
         strhour := rune(hour)
         currdate := string((datetime.Format(DDMMYYYY)))
-        PopulateUptimeLogs := currdate + ":000000000000000000000000\n"
-        tempFilePath, err := createTestUptimeLogsFileWithContent(PopulateUptimeLogs)
+        PopulateUptimeLog := currdate + ":000000000000000000000000\n"
+        tempFilePath, err := createTestUptimeLogFileWithContent(PopulateUptimeLog)
         if err != nil {
                 t.Fatalf("Failed to populate uptime logs content for testing")
         }
         uptimelog, _ := readUptimeLogFile(tempFilePath)
-        uptimelog =  updateUptimeLogs(uptimelog)
+        uptimelog =  updateUptimeLog(uptimelog)
         timeupd := string(uptimelog[currdate])
         activehr := timeupd[strhour:strhour+1]
         if activehr != "1" {
