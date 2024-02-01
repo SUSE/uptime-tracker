@@ -20,7 +20,7 @@ var (
 )
 
 const (
-	uptimeCheckLogsFilePath = "/etc/zypp/suse-uptime.logs"
+	uptimeCheckLogsFilePath = "/etc/zypp/suse-uptime.log"
 	dateStringFormat        = "2006-01-02"
 	initUptimeHours         = "000000000000000000000000" // initialize the uptime hours bit string with
 	daysBeforePurge         = 90                         // purge all the records after this many days
@@ -57,7 +57,7 @@ func readUptimeLogFile(uptimeLogsFilePath string) (map[string]string, error) {
 		entryText := fileScanner.Text()
 		entry = strings.Split(entryText, ":")
 		if len(entry) != 2 {
-			return nil, errors.New("Uptime logs file is corrupted. Invalid log entry " + entryText)
+			return nil, errors.New("Uptime log file is corrupted. Invalid log entry " + entryText)
 		}
 		logEntries[entry[0]] = entry[1]
 	}
@@ -68,7 +68,7 @@ func readUptimeLogFile(uptimeLogsFilePath string) (map[string]string, error) {
 	return logEntries, nil
 }
 
-func purgeOldUptimeLogs(uptimeLogs map[string]string) (map[string]string, error) {
+func purgeOldUptimeLog(uptimeLogs map[string]string) (map[string]string, error) {
 	now := time.Now().UTC()
 	purgeBefore := now.AddDate(0, 0, -daysBeforePurge)
 	var purgedLogs = make(map[string]string)
@@ -84,7 +84,7 @@ func purgeOldUptimeLogs(uptimeLogs map[string]string) (map[string]string, error)
 	return purgedLogs, nil
 }
 
-func updateUptimeLogs(uptimeLogs map[string]string) map[string]string {
+func updateUptimeLog(uptimeLogs map[string]string) map[string]string {
 	// NOTE: we are standardizing timezone to UTC
 	now := time.Now().UTC()
 	day := now.Format(dateStringFormat)
@@ -142,9 +142,9 @@ func main() {
 
 	uptimeLogs, err := readUptimeLogFile(uptimeCheckLogsFilePath)
 	exitOnError(err)
-	uptimeLogs, err = purgeOldUptimeLogs(uptimeLogs)
+	uptimeLogs, err = purgeOldUptimeLog(uptimeLogs)
 	exitOnError(err)
-	uptimeLogs = updateUptimeLogs(uptimeLogs)
+	uptimeLogs = updateUptimeLog(uptimeLogs)
 	err = writeUptimeLogsFile(uptimeCheckLogsFilePath, uptimeLogs)
 	exitOnError(err)
 }
