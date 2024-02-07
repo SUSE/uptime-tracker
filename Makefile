@@ -18,7 +18,7 @@ test: suse-uptime-tracker/version.txt
 	go test -v ./suse-uptime-tracker
 
 gofmt:
-	@if [ ! -z "$$(gofmt -l ./)" ]; then echo "Formatting errors..."; gofmt -d ./; exit 1; fi
+	@if [ ! -z "$$(gofmt -l ./suse-uptime-tracker)" ]; then echo "Formatting errors..."; gofmt -d ./; exit 1; fi
 
 build-arm: out suse-uptime-tracker/version.txt
 	GOOS=linux GOARCH=arm64 GOARM=7 go build -v -o out/ github.com/SUSE/uptime-tracker/suse-uptime-tracker
